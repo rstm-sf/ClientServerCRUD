@@ -7,7 +7,7 @@ open Shared
 let initialState() = 
     let initState =
         {
-            Users    = Array.zeroCreate 0
+            Users    = Map.empty
             NewUser  = None
             Error    = None
             PrevUser = None
@@ -43,12 +43,12 @@ let update (msg: Msg) (prevState: State) =
         | Some user -> prevState, Server.addUser user
 
     | UserAdded user ->
-        let nextUsers = prevState.Users |> Array.append [| UserModel.Create user |]
+        let nextUsers = prevState.Users |> Map.add user.Id (UserModel.Create user)
         let nextState = { prevState with Users = nextUsers; NewUser = None; Error = None }
         nextState, Cmd.none
             
     | UsersLoaded users ->
-        let nextUsers = users |> Seq.map UserModel.Create |> Seq.toArray
+        let nextUsers = users |> List.map (fun x -> x.Id, UserModel.Create x) |> Map.ofList
         let nextState = { prevState with Users = nextUsers; Error = None}
         nextState, Cmd.none
     
@@ -56,17 +56,15 @@ let update (msg: Msg) (prevState: State) =
         prevState, Server.updateUser user
     
     | UserUpdated user ->
-        let idx = findUserIndexById prevState.Users user.Id
-        prevState.Users.[idx] <- UserModel.Create user
-
-        let nextState = { prevState with Error = None }
+        let nextUsers = prevState.Users |> Map.add user.Id (UserModel.Create user)
+        let nextState = { prevState with Users = nextUsers; Error = None }
         nextState, Cmd.none
 
     | DeleteUser userId ->
         prevState, Server.deleteUser userId
 
     | UserDeleted user ->
-        let nextUsers = prevState.Users |> Array.filter (fun x -> x.Id <> user.Id)
+        let nextUsers = prevState.Users |> Map.remove user.Id
         let nextState = { prevState with Users = nextUsers; Error = None }
         nextState, Cmd.none
 
@@ -76,23 +74,22 @@ let update (msg: Msg) (prevState: State) =
                  Some user, { user with RowState = state }
             else None, prevState.PrevUser.Value
 
-        let idx = findUserIndexById prevState.Users id
-        let prevUser, newUser = getUpdatedUser prevState.Users.[idx]
-        prevState.Users.[idx] <- newUser
+        let prevUser, newUser = getUpdatedUser prevState.Users.[id]
 
-        let nextState = { prevState with Error = None; PrevUser = prevUser }
+        let nextUsers = prevState.Users |> Map.add id newUser
+        let nextState = { prevState with Users = nextUsers; Error = None; PrevUser = prevUser }
         nextState, Cmd.none
 
     | UpdateRowName (id : UserId, name : string, isFirstName : bool) ->
         let userUpdated (x : UserModel) =
             if isFirstName then
-               { x with FirstName = name }
+                 { x with FirstName = name }
             else { x with LastName = name }
 
-        let idx = findUserIndexById prevState.Users id
-        prevState.Users.[idx] <- userUpdated prevState.Users.[idx]
+        let userUpdated = userUpdated prevState.Users.[id]
 
-        let nextState = { prevState with Error = None }
+        let nextUsers = prevState.Users |> Map.add id userUpdated
+        let nextState = { prevState with Users = nextUsers; Error = None }
         nextState, Cmd.none
 
     | LoadUsersFailure er ->

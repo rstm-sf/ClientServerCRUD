@@ -36,7 +36,7 @@ type ErrorMessage =
 
 type State =
     {
-        Users    : UserModel array
+        Users    : Map<UserId, UserModel>
         NewUser  : User option
         Error    : ErrorMessage option
         PrevUser : UserModel option
