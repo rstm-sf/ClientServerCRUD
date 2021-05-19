@@ -16,7 +16,7 @@ let isDangerId (error : ErrorMessage option) (id : UserId) =
 let divFieldUser =
     div [ ClassName "field is-grouped is-grouped-centered" ]
 let divInputClass =
-    div [ ClassName "control is-medium" ]
+    div [ ClassName "control is-normal" ]
 
 let errorMessage (error : string) =
     [ divFieldUser
@@ -24,7 +24,7 @@ let errorMessage (error : string) =
                [ str error ]] ]
 
 let renderButton (strButton : string) (color : string) (clickEventFunc : MouseEvent -> unit) =
-    let classname = sprintf "button is-medium %s" color
+    let classname = sprintf "button is-normal %s" color
     [ button [ ClassName classname
                Style [ Width widthButton ]
                OnClick clickEventFunc ]
@@ -32,11 +32,11 @@ let renderButton (strButton : string) (color : string) (clickEventFunc : MouseEv
 
 let renderInputNameReadonly (name : string) =
     [ input [ ReadOnly true
-              ClassName "input is-medium"
+              ClassName "input is-normal"
               Value name ] ]
 
 let renderInputName (placeHolder : string) (value : string) (changeEventFunc : Event -> unit) (isDanger : bool) =
-    [ input [ ClassName ("input is-medium" + if isDanger then " is-danger" else "")
+    [ input [ ClassName ("input is-normal" + if isDanger then " is-danger" else "")
               Placeholder placeHolder
               DefaultValue value
               Value value
@@ -61,12 +61,11 @@ let renderUser (user: UserModel) (error : ErrorMessage option) (dispatch : Msg -
         if user.RowState = RowState.HasEdit then
              renderButton "Update" "is-danger" (fun _ -> user    |> UpdateUser |> dispatch)
         else renderButton "Delete" "is-danger" (fun _ -> user.Id |> DeleteUser |> dispatch)
-    divFieldUser
-        [
-            divInputClass firstInput
-            divInputClass lastInput
-            divInputClass firstButton
-            divInputClass secondButton ]
+    tr [] [
+         td [] [ divInputClass firstInput   ]
+         td [] [ divInputClass lastInput    ]
+         td [] [ divInputClass firstButton  ]
+         td [] [ divInputClass secondButton ] ]
 
 
 let addUser (state: State) (dispatch : Msg -> unit) =
@@ -81,16 +80,22 @@ let addUser (state: State) (dispatch : Msg -> unit) =
             divInputClass firstInput
             divInputClass lastInput
             divInputClass
-                [ button [ ClassName "button is-medium is-success"
-                           Style [ Width (2 * widthButton + 10) ]
+                [ button [ ClassName "button is-normal is-success"
+                           Style [ Width widthButton ]
                            OnClick (fun _ -> dispatch AddUser) ]
                          [ str "Add" ] ] ]
 
 let render (state: State) (dispatch : Msg -> unit) =
+    let rows = state.Users |> List.map (fun user -> renderUser user state.Error dispatch)
     div
         [ Style [ Padding 20 ] ]
         [ yield! (if state.Error.IsSome then (errorMessage state.Error.Value.Message) else [])
-          yield div [ ClassName "box" ] [ addUser state dispatch ]
-          yield div
-                [ ClassName "box" ]
-                [ yield! state.Users |> List.map (fun user -> renderUser user state.Error dispatch) ] ]
+          div [ ClassName "box" ] [ addUser state dispatch ]
+          div
+              [ ClassName "box"
+                Style [ TextAlign TextAlignOptions.Center ] ]
+              [ table [ ClassName "table"
+                        Style [ Display DisplayOptions.InlineBlock ] ]
+                      [
+                        thead [] [tr [] [th [] [str "First Name"]; th [] [str "Last Name"]; th [] []; th [] []]]
+                        tbody [] rows ]]]
