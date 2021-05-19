@@ -1,6 +1,10 @@
 # Client-Server-CRUD 
 
-Simple client-server CRUD application written in F#. Usage:
+![](assets/ScreenShot.png)
+
+## About
+
+A simple CRUD web application written in F#. Usage:
 - [Elmish](https://elmish.github.io/elmish/) for Elm-style SPA.
 - [Fable](https://fable.io/) for compiling F# code to JS.
 - [Bulma](https://bulma.io/) as the CSS framework.
