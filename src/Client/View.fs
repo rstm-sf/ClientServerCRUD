@@ -86,7 +86,7 @@ let addUser (state: State) (dispatch : Msg -> unit) =
                          [ str "Add" ] ] ]
 
 let render (state: State) (dispatch : Msg -> unit) =
-    let rows = state.Users |> List.map (fun user -> renderUser user state.Error dispatch)
+    let rows = state.Users |> Array.map (fun user -> renderUser user state.Error dispatch)
     div
         [ Style [ Padding 20 ] ]
         [ yield! (if state.Error.IsSome then (errorMessage state.Error.Value.Message) else [])
