@@ -1,0 +1,27 @@
+{
+    "private": true,
+    "dependencies": {
+        "babel-polyfill": "6.26.0",
+        "babel-runtime": "6.26.0",
+        "react": "^16.14.0",
+        "react-dom": "^16.14.0",
+        "remotedev": "^0.2.9"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.0.0",
+        "@babel/polyfill": "^7.0.0",
+        "@babel/preset-env": "^7.0.0",
+        "babel-loader": "^8.0.0",
+        "fable-compiler": "^2.1.4",
+        "fable-loader": "^2.1.0",
+        "loglevel": "^1.6.0",
+        "qunitjs": "^2.0.1",
+        "webpack": "^4.8.1",
+        "webpack-cli": "^3.0.1",
+        "webpack-dev-server": "^3.1.4"
+    },
+    "scripts": {
+        "start": "webpack-dev-server",
+        "build": "webpack"
+    }
+}

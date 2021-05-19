@@ -1,0 +1,16 @@
+.fable/
+
+.idea/
+.ionide/
+.vs/
+.vscode/
+
+bin/
+obj/
+
+node_modules/
+
+*.user
+*.fs.js
+
+smth.db
